@@ -51,8 +51,6 @@ typedef	struct	s_raycast
 	int			drawstart;
 	int			drawend;
 	double		wallx;
-	long		d;
-	int			texnum;
 	int			texoption;
 }				t_raycast;
 

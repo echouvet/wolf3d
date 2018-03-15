@@ -18,21 +18,24 @@
 ** if option is 0, mapx and mapy are used to know which wall we're looking at.
 */
 
-void	texnum(t_env *e)
+int		texnumber(t_env *e)
 {
+	int texnum;
+
 	if (e->r.texoption == 0)
-		e->r.texnum = e->map[e->r.mapx][e->r.mapy] - 1;
+		texnum = e->map[e->r.mapx][e->r.mapy] - 1;
 	else
 	{
 		if (e->r.side == 0 && e->r.raydirx < 0)
-			e->r.texnum = 6;
+			texnum = 6;
 		if (e->r.side == 0 && e->r.raydirx >= 0)
-			e->r.texnum = 7;
+			texnum = 7;
 		if (e->r.side == 1 && e->r.raydiry >= 0)
-			e->r.texnum = 8;
+			texnum = 8;
 		if (e->r.side == 1 && e->r.raydiry < 0)
-			e->r.texnum = 9;
+			texnum = 9;
 	}
+	return (texnum);
 }
 
 /*
@@ -47,8 +50,8 @@ void	texnum(t_env *e)
 ** negative direction. This makes it so that the texture isn't upside down
 **
 ** While loop allows us to find exact color for each pixel on the line.
-**
-//						texy's equation is magic, please explain it to me if you get it.
+** texx and texy will be the coordinates of the texture where we will
+** find the colour necesarry for each pixel on the line.
 **
 ** Now that I know the x and y value of my texture, I set my color
 ** to the color in the texture which I'd retrieved in texture.c
@@ -61,7 +64,7 @@ void	texnum(t_env *e)
 ** I then place my pixel in my window. put_pixel is in basics.c.
 */
 
-void	put_textures(t_env *e, int x)
+void	put_textures(t_env *e, int x, int texnum)
 {
 	int y;
 	int color;
@@ -77,7 +80,10 @@ void	put_textures(t_env *e, int x)
 	while (y < e->r.drawend)
 	{
 		texy = (((y * 256 - e->h * 128 + e->r.lh * 128) * 64) / e->r.lh / 256);
-		color = e->t[e->r.texnum].pxl[64 * texy + texx];
+		if (texx > 64 || texy > 64)
+			color = 0x000000;
+		else
+			color = e->t[texnum].pxl[64 * texy + texx];
 		if (e->r.side == 1 && e->r.texoption == 0)
 			color = (color >> 1) & 0x7F7F7F;
 		put_pixel(e, x, y, color);
@@ -105,7 +111,7 @@ void	put_textures(t_env *e, int x)
 ** it will help calculate the x coordinate of the texture (texx).
 */
 
-void	side_and_walldist(t_env *e)
+void	walldistance(t_env *e)
 {
 	while (e->map[e->r.mapx][e->r.mapy] == 0)
 	{
@@ -143,7 +149,7 @@ void	side_and_walldist(t_env *e)
 ** negative direction when I calculate the distante to first wall.
 */
 
-void	step_and_sidedist(t_env *e)
+void	firstside(t_env *e)
 {
 	if (e->r.raydirx < 0)
 	{
@@ -168,11 +174,11 @@ void	step_and_sidedist(t_env *e)
 }
 
 /*
-** while loop will run for every vertial stripe (1500 times)
-** camerax goes from -1 to 1: it's the relative diffenrence between each line.
-** raydir are the direction/position a ray will be cast. The dir and plane are
-** defined by the rotation matrixes in move.c.
-** mapx and mapy are the square of the map the ray is in. it casts pos as int
+** while loop will run for every vertial line on window
+** camerax goes from -1 to 1, to define which vertical line we're calculating
+** raydir: the direction/position the ray will be cast.
+** The dir and plane are always perpendicular, They change in move.c.
+** mapx and mapy are the square of the map the ray is in. it casts pos to int
 ** to get the map position of the character for raycasting calculations.
 **
 ** deltadist is  is the distance from one x or y side to the next.
@@ -194,15 +200,15 @@ void	raycasting(t_env *e)
 	x = 0;
 	while (x < e->w)
 	{
-		e->r.camerax = (2 * x) / (double)e->w - 1;
+		e->r.camerax = ((2 * x) / (double)e->w) - 1;
 		e->r.raydirx = e->r.dirx + e->r.planex * e->r.camerax;
 		e->r.raydiry = e->r.diry + e->r.planey * e->r.camerax;
-		e->r.mapx = e->r.posx;
-		e->r.mapy = e->r.posy;
 		e->r.deltadistx = fabs(1 / e->r.raydirx);
 		e->r.deltadisty = fabs(1 / e->r.raydiry);
-		step_and_sidedist(e);
-		side_and_walldist(e);
+		e->r.mapx = e->r.posx;
+		e->r.mapy = e->r.posy;
+		firstside(e);
+		walldistance(e);
 		e->r.lh = (int)(e->h / e->r.wd);
 		e->r.drawstart = -e->r.lh / 2 + e->h / 2;
 		if (e->r.drawstart < 0)
@@ -210,8 +216,7 @@ void	raycasting(t_env *e)
 		e->r.drawend = e->r.lh / 2 + e->h / 2;
 		if (e->r.drawend >= e->h)
 			e->r.drawend = e->h - 1;
-		texnum(e);
-		put_textures(e, x);
+		put_textures(e, x, texnumber(e));
 		x++;
 	}
 }

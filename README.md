@@ -1,4 +1,6 @@
-Compilation: type "make" at the root of the git repository. 
+#Wolf3D
+
+To Compile - type "make" at the root of the git repository. 
 
 Execution: Compile, and an executable will be created.
 Type "./" followed by the executable as a first argument, followed by a valid map as a second argument. 

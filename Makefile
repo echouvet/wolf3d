@@ -26,14 +26,14 @@ background_minimap.c
 
 OBJ = $(SRC:.c=.o)
 CC = gcc
-CFLAGS = -g3 -Wall -Werror -Wextra  #-Ofast -flto -march=native #-fsanitize=address  -Ofast -flto -march=native 
-EXT = -lmlx -framework OpenGL -framework Appkit
+CFLAGS = -g3 -Wall -Werror -Wextra
+EXT = -framework OpenGL -framework Appkit
 
 all: $(NAME)
 	
 $(NAME): $(OBJ)
 	@make -C $(LIB)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBPATH) $(EXT)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBPATH) $(EXT) mlx/libmlx.a
 
 clean:
 	rm -rf $(OBJ)

@@ -13,7 +13,7 @@
 #ifndef WOLF_H
 # define WOLF_H
 
-# include "mlx.h"
+# include "mlx/mlx.h"
 # include "libft/libft.h"
 # include <math.h>
 # include <fcntl.h>

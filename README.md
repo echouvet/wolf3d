@@ -1,5 +1,7 @@
 # Wolf3D
 
+This is a project which asks to reproduce in C the 3D raycasting game mechanics of Wolfenstein 3D.
+
 To Compile - type "make" at the root of the git repository. 
 
 Execution: Compile, and an executable will be created.

@@ -2,7 +2,7 @@
 
 Compilation - type "make" at the root of the git repository. An executable named wolf3d will be created.
 
-Execution : Type "./wolf3d" followed by the path to a valid map as the second argument. Some valid maps are available in the maps folder at the root of the directory.
+Execution : Type "./wolf3d" followed by the path to a valid map as the second argument. Some valid maps are available in the maps folder at the root of the directory. (I reccommend testing the brick_labyrinthe)
 
 The following keyboard keys interact with the program: 
 
